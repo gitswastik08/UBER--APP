@@ -2,6 +2,7 @@ const userModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const blacklistTokenModel = require("../models/blacklistToken.model");
+const captainModel = require("../models/captain.model");
 
 module.exports.authUser = async (req, res, next) => {
   const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
@@ -50,11 +51,14 @@ module.exports.authCaptain = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const captain = await captainModel.findById(decoded._id); // Captain Model se check kar
 
+
     if (!captain) {
       return res.status(404).json({ message: "Captain not found." });
     }
 
     req.captain = captain; // Captain ka data request me attach kar raha hu
+   
+    
     next();
   } catch (error) {
     console.error("JWT Auth Error:", error);

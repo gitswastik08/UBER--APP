@@ -8,6 +8,8 @@ module.exports.registerCaptain = async function (req, res, next) {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+  console.log(errors.message);
+  
   const { fullname, email, password, vehicle } = req.body;
   console.log("sas", fullname);
 

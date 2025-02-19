@@ -1,5 +1,8 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { CaptainDataContext } from "../context/CaptainContext";
 
 const Captainsignup = () => {
   const [email, setEmail] = useState("");
@@ -12,35 +15,9 @@ const Captainsignup = () => {
   const [vehicleCapacity, setVehicleCapacity] = useState("");
   const [vehicleType, setVehicleType] = useState("");
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    const captainData = {
-      email: email,
-      password: password,
-      fullname: {
-        firstName: firstName,
-        lastName: lastName,
-      },
-      vehicle: {
-        color: vehicleColor,
-        plate: vehiclePlate,
-        capacity: vehicleCapacity,
-        vehicleType: vehicleType,
-      },
-    };
-   
+  const navigate = useNavigate();
+  const { captain, setCaptain } = useContext(CaptainDataContext);
 
-    setEmail("");
-    setPassword("");
-    setFirstName("");
-    setLastName("");
-    setVehicleColor("");
-    setVehiclePlate("");
-    setVehicleCapacity("");
-    setVehicleType("");
-  };
-
-  
   return (
     <div className="py-0 px-7 h-screen flex flex-col justify-between">
       <div>
@@ -52,8 +29,45 @@ const Captainsignup = () => {
 
         <form
           className="mt-4 "
-          onSubmit={(e) => {
-            submitHandler(e);
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const newCaptain = {
+              fullname: {
+                firstname: firstName,
+                lastname: lastName,
+              },
+
+              email: email,
+              password: password,
+
+              vehicle: {
+                color: vehicleColor,
+                plate: vehiclePlate,
+                capacity: vehicleCapacity,
+                vehicleType: vehicleType,
+              },
+            };
+
+            const response = await axios.post(
+              `${import.meta.env.VITE_BASE_URL}/captains/register`,
+              newCaptain
+            );
+
+            if (response.status === 201) {
+              const data = response.data;
+              setCaptain(data.captain);
+              localStorage.setItem("token", data.token);
+              navigate("/captain/home");
+            }
+
+            setEmail("");
+            setPassword("");
+            setFirstName("");
+            setLastName("");
+            setVehicleColor("");
+            setVehiclePlate("");
+            setVehicleCapacity("");
+            setVehicleType("");
           }}
         >
           <h3 className="text-lg w-full  font-medium ">

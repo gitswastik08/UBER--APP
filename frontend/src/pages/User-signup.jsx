@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { UserDataContext } from "../context/Usercontext";
 
 const Usersignup = () => {
   const [email, setEmail] = useState("");
@@ -7,6 +9,9 @@ const Usersignup = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userData, setUserData] = useState({});
+  const navigate = useNavigate();
+
+  const { user, setUser } = useContext(UserDataContext);
   return (
     <div>
       <div className="p-7 h-screen flex flex-col justify-between">
@@ -17,24 +22,34 @@ const Usersignup = () => {
             alt=""
           />
 
-          <form onSubmit={(e)=>{
-            e.preventDefault()
-            setUserData({
-              fullname:{
-                firstname: firstName,
-                lastname: lastName,
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const newUser = {
+                fullname: {
+                  firstname: firstName,
+                  lastname: lastName,
                 },
-              email: email,
-              password: password
-             
-            })
-            setEmail("")
-            setPassword("")
-            setFirstName("")
-            setLastName("")
+                email: email,
+                password: password,
+              };
 
-           
-          }}>
+              const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/users/register`,
+                newUser
+              );
+              if (response.status === 201) {
+                const data = response.data;
+                setUser(data.user);
+                localStorage.setItem("token",data.token); 
+                navigate("/user/home");
+              }
+              setEmail("");
+              setPassword("");
+              setFirstName("");
+              setLastName("");
+            }}
+          >
             <h3 className="text-lg w-1/2  font-medium mb-2">
               What's your name
             </h3>

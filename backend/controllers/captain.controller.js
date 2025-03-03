@@ -11,7 +11,7 @@ module.exports.registerCaptain = async function (req, res, next) {
   console.log(errors.message);
   
   const { fullname, email, password, vehicle } = req.body;
-  console.log("sas", fullname);
+ 
 
   const isCaptainAlreadyRegistered = await captainModel.findOne({ email });
   if (isCaptainAlreadyRegistered) {
@@ -43,10 +43,10 @@ module.exports.loginCaptain = async function (req, res, next) {
   }
 
   const { email, password } = req.body;
-  console.log(email, password);
+
 
   const captain = await captainModel.findOne({ email }).select("+password");
-  console.log("captain", captain);
+  
 
   if (!captain) {
     return res.status(401).json({ message: "Invalid email or password" });
